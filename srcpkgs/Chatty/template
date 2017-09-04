@@ -1,0 +1,42 @@
+# Template file for 'Chatty'
+
+pkgname=Chatty
+version=0.8.6
+revision=1
+build_style=fetch
+short_desc="Twitch Chat Client written in Java"
+maintainer="Rinus <duotrio@airmail.cc>"
+license="MIT"
+homepage="https://github.com/chatty/chatty"
+distfiles="https://github.com/chatty/chatty/archive/v${version}.tar.gz"
+checksum="fcf2c928927aceab2c9caa28f1a841940fd6ca07ff87ce0055ef9bce60d77a20"
+makedepends="unzip gradle apache-ant tar"
+depends="virtual?java-environment"
+
+do_build() {
+	tar xzf v${version}.tar.gz
+	cd chatty-${version}
+	export PATH=/usr/lib/jvm/java-8-openjdk/jre/bin/:$PATH
+	gradle build
+	gradle allPlatformsZip
+	cd ..
+}
+
+post_build() {
+	unzip chatty-${version}/build/releases/${pkgname}_${version}.zip
+}
+
+pre_install() {
+	vmkdir usr/share/
+	vmkdir usr/share/pixmaps/
+	vmkdir usr/bin/
+}
+
+do_install() {
+	vinstall ${pkgname}.jar 0644 /usr/share/${pkgname}/
+	vcopy img/ usr/share/${pkgname}/
+	vcopy sounds/ usr/share/${pkgname}/
+	vcopy ${FILESDIR}/icons2.png usr/share/pixmaps/${pkgname}.png
+	vbin ${FILESDIR}/${pkgname}
+	vlicense ${FILESDIR}/APACHE_LICENSE
+}
